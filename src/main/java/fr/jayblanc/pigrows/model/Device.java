@@ -1,19 +1,23 @@
 package fr.jayblanc.pigrows.model;
 
-import java.sql.Date;
-
 public class Device {
 
     private String key;
     private String name;
     private String description;
-    private Date registrationDate;
-    private Date lastActivityDate;
+    private long registration;
+    private long lastActivity;
+    private DeviceConfig config;
+    private boolean configChanged = false;
 
-    public Device(String key, String name) {
+    public Device(String key, String name, String description) {
         super();
         this.key = key;
         this.name = name;
+        this.description = description;
+        this.registration = System.currentTimeMillis();
+        this.lastActivity = this.registration;
+        config = new DeviceConfig();
     }
 
     public String getKey() {
@@ -40,20 +44,37 @@ public class Device {
         this.description = description;
     }
 
-    public Date getRegistrationDate() {
-        return registrationDate;
+    public long getRegistration() {
+        return registration;
     }
 
-    public void setRegistrationDate(Date registrationDate) {
-        this.registrationDate = registrationDate;
+    public void setRegistration(long registration) {
+        this.registration = registration;
     }
 
-    public Date getLastActivityDate() {
-        return lastActivityDate;
+    public long getLastActivity() {
+        return lastActivity;
     }
 
-    public void setLastActivityDate(Date lastActivityDate) {
-        this.lastActivityDate = lastActivityDate;
+    public void setLastActivity(long lastActivity) {
+        this.lastActivity = lastActivity;
+    }
+
+    public DeviceConfig getConfig() {
+        return config;
+    }
+
+    public void setConfig(DeviceConfig config) {
+        this.config = config;
+        configChanged = true;
+    }
+
+    public boolean isConfigChanged() {
+        return configChanged;
+    }
+
+    public void setConfigChanged(boolean configChanged) {
+        this.configChanged = configChanged;
     }
 
 }
