@@ -30,7 +30,7 @@
 	</#list>
 	<nav>
 		<#if nbpages gt 1>
-			<#assign base = "${context}/html/events" >
+			<#assign base = "${context}/api/html/events" >
 			<@pages size=nbpages p=page base=base/>
 		</#if>
 	</nav>

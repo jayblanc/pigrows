@@ -23,8 +23,8 @@
 						<td>${device.description}</td>
 						<td>${device.lastActivity?number_to_datetime}</td>
 						<td width="100px">
-							<a class="btn btn-default btn-sm" href="${context}/html/devices/${device.key}" role="button"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span></a>
-							<a class="btn btn-default btn-sm" href="${context}/pictures/${device.key}" role="button"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+							<a class="btn btn-default btn-sm" href="${context}/api/html/devices/${device.key}" role="button"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span></a>
+							<a class="btn btn-default btn-sm" href="${context}/api/pictures/${device.key}" role="button"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
 						</td>
 					</tr>
 				</#items>
@@ -44,7 +44,7 @@
 <div class="modal fade" id="createDeviceModal" tabindex="-1" role="dialog" aria-labelledby="createDeviceLabel">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-			<form class="form-horizontal" method="post" action="${context}/html/devices">
+			<form class="form-horizontal" method="post" action="${context}/api/html/devices">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					<h4 class="modal-title" id="createDeviceLabel">Déclarer un nouveau dispositif</h4>

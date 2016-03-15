@@ -18,12 +18,12 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="${context}/html">PiGrows</a>
+        <a class="navbar-brand" href="${context}/api/html">PiGrows</a>
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li><a href="${context}/html/devices">Dispositifs</a></li>
-          <li><a href="${context}/html/events">Événements</a></li>
+          <li><a href="${context}/api/html/devices">Dispositifs</a></li>
+          <li><a href="${context}/api/html/events">Événements</a></li>
         </ul>
       </div>
     </div>

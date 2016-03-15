@@ -23,8 +23,8 @@
 						<td>${formatsize(folder.size)}</td>
 						<td>${folder.lastModification}</td>
 						<td width="100px">
-							<a class="btn btn-default btn-sm" href="${context}/html/devices/${key}/${folder.name}" role="button"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span></a>
-							<a class="btn btn-default btn-sm" href="${context}/pictures/${key}/${folder.name}" role="button"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+							<a class="btn btn-default btn-sm" href="${context}/api/html/devices/${key}/${folder.name}" role="button"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span></a>
+							<a class="btn btn-default btn-sm" href="${context}/api/pictures/${key}/${folder.name}" role="button"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
 						</td>
 					</tr>
 				</#items>
