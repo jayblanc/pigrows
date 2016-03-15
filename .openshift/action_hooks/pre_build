@@ -1,2 +1,2 @@
 export JAVA_HOME="/etc/alternatives/java_sdk_1.8.0"
-export PATH=/etc/alternatives/java_sdk_1.8.0/bin:$PATH
+export PATH=$OPENSHIFT_DATA_DIR/mvn:/etc/alternatives/java_sdk_1.8.0/bin:$PATH
