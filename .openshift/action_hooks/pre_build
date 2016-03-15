@@ -1,5 +1,4 @@
-echo "This is my pre build hook !!"
 export JAVA_HOME=/etc/alternatives/java_sdk_1.8.0
-export PATH=/etc/alternatives/java_sdk_1.8.0/bin:$PATH
-echo "Java Home set to : $JAVA_HOME"
-echo `java -version`
+export PATH=/etc/alternatives/java_sdk_1.8.0/bin:$OPENSHIFT_DATA_DIR/bin:$PATH
+echo "Prebuilt modification for maven"
+echo `mvn -version`
