@@ -98,6 +98,10 @@
 					</plugin>
 				</plugins>
 			</build>
+			<properties>
+				<maven.compiler.executable>/etc/alternatives/java-sdk-1.8.0/bin/javac</maven.compiler.executable>
+				<maven.compiler.fork>true</maven.compiler.fork>
+			</properties>
 		</profile>
 	</profiles>
 </project>
