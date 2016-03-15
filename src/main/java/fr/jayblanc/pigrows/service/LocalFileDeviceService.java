@@ -21,7 +21,7 @@ import fr.jayblanc.pigrows.model.Device;
 
 public class LocalFileDeviceService implements DeviceService {
 
-    private static final Logger LOGGER = Logger.getLogger(PiGrowsConfig.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LocalFileDeviceService.class.getName());
 
     private Gson gson;
     private Map<String, Device> devices;

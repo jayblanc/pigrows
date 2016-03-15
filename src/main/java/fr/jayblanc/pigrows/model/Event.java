@@ -1,24 +1,35 @@
 package fr.jayblanc.pigrows.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 public class Event {
 
-    private EventType type;
+    private static final DateFormat sdf = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
+    private static final String SEPARATOR = ",";
+    
     private String key;
+    private EventType type;
     private String message;
-    private long timestamp;
+    private String date;
 
     public Event() {
         super();
+        this.date = sdf.format(new Date(System.currentTimeMillis()));
     }
 
-    public Event(EventType type, String key, String message, long timestamp) {
-        super();
+    public Event(String key, EventType type, String message) {
+        this();
         this.type = type;
         this.key = key;
         this.message = message;
-        this.timestamp = timestamp;
+    }
+    
+    private Event(String key, EventType type, String message, String date) {
+        this(key, type, message);
+        this.date = date;
     }
 
     public EventType getType() {
@@ -45,17 +56,23 @@ public class Event {
         this.message = message;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public String getDate() {
+        return date;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public String serialize() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(date).append(SEPARATOR).append(key).append(SEPARATOR).append(type).append(SEPARATOR).append(message).append("\r\n");
+        return builder.toString();
     }
     
-    @Override
-    public String toString() {
-        return "DeviceEvent [type=" + type + ", key=" + key + ", message=" + message + ", date=" + new Date(timestamp) + "]";
+    public static Event deserialize(String serializedEvent) {
+        StringTokenizer strtok = new StringTokenizer(serializedEvent, SEPARATOR);
+        String date = strtok.nextToken();
+        String key = strtok.nextToken();
+        EventType type = EventType.valueOf(strtok.nextToken());
+        String message = strtok.nextToken();
+        return new Event(key, type, message, date);
     }
 
     public enum EventType {

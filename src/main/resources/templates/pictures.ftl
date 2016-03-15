@@ -29,11 +29,11 @@
 		<p>Il n'y a aucun dossier d'images pour ce dispositif</p>
 	</#list>
 	<nav>
-	<#if nbpages gt 1>
-		<#assign base = "${context}/html/devices/${key}/${folder}" >
-		<@pages size=nbpages p=page base=base/>
-	</#if>
-</nav>
+		<#if nbpages gt 1>
+			<#assign base = "${context}/html/devices/${key}/${folder}" >
+			<@pages size=nbpages p=page base=base/>
+		</#if>
+	</nav>
 </div>
 
 <#include "/common/foot.ftl">  
