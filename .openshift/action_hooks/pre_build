@@ -1,0 +1,7 @@
+echo "This is my pre build hook !!"
+export JAVA_HOME=/etc/alternatives/java_sdk_1.8.0
+export MAVEN_HOME=$OPENSHIFT_DATA_DIR/apache-maven-3.3.3
+export M2_HOME=$OPENSHIFT_DATA_DIR/apache-maven-3.3.3
+export PATH=/etc/alternatives/java_sdk_1.8.0/bin:$OPENSHIFT_DATA_DIR/apache-maven-3.3.3/bin:$PATH
+echo "Java Home set to : $JAVA_HOME"
+echo `java -version`
