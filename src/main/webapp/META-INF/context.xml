@@ -1,0 +1,3 @@
+<context path="/pigrows">
+	<Resource name="mail/Session" auth="Container" type="javax.mail.Session" mail.smtp.host="localhost"/>
+</context>
