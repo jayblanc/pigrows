@@ -1,6 +1,6 @@
 package fr.jayblanc.pigrows.model;
 
-public class DeviceConfig {
+public class PictureParams {
 
     private int quality = 90;
     private int sharpness = 0;
@@ -11,11 +11,11 @@ public class DeviceConfig {
     private int exposure = 0;
     private WhiteBalance whiteBalance = WhiteBalance.AUTO;
 
-    public DeviceConfig() {
+    public PictureParams() {
         super();
     }
 
-    public DeviceConfig(int quality, int sharpness, int contrast, int brightness, int saturation, int iSO, int exposure, WhiteBalance wb) {
+    public PictureParams(int quality, int sharpness, int contrast, int brightness, int saturation, int iSO, int exposure, WhiteBalance wb) {
         super();
         this.quality = quality;
         this.sharpness = sharpness;

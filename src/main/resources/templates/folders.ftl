@@ -10,7 +10,7 @@
 					<th>Nom</th>
 					<th>Nb Images</th>
 					<th>Taille</th>
-					<th>Dernière Modification</th>
+					<th>Derni&eagrave;re Modification</th>
 					<th>Action</th>
 				</tr>
 			</thead>

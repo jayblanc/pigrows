@@ -1,0 +1,74 @@
+#!/bin/bash
+
+set -x
+
+if [ ! -d $OPENSHIFT_DATA_DIR/m2/repository ]
+        then
+                cd $OPENSHIFT_DATA_DIR
+				        mkdir m2/repository
+fi
+
+if [ ! -d $OPENSHIFT_DATA_DIR/logs ]
+        then
+                cd $OPENSHIFT_DATA_DIR
+				        mkdir logs
+fi
+
+if [ ! -d $OPENSHIFT_DATA_DIR/jdk1.8.0_73 ]
+        then
+                cd $OPENSHIFT_DATA_DIR
+		            wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u73-b02/jdk-8u73-linux-x64.tar.gz
+                tar xvf *.tar.gz
+                rm -f *.tar.gz
+fi
+
+if [ ! -d $OPENSHIFT_DATA_DIR/apache-maven-3.3.3 ]
+        then
+                cd $OPENSHIFT_DATA_DIR
+                wget http://mirror.cc.columbia.edu/pub/software/apache/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz
+                tar xvf *.tar.gz
+                rm -f *.tar.gz
+fi
+
+if [ ! -d $OPENSHIFT_DATA_DIR/apache-tomcat-8.0.32 ]
+        then
+                cd $OPENSHIFT_DATA_DIR
+                wget http://apache.websitebeheerjd.nl/tomcat/tomcat-8/v8.0.32/bin/apache-tomcat-8.0.32.tar.gz
+                tar xvf *.tar.gz
+                rm -f *.tar.gz
+                cd apache-tomcat-8.0.32/conf/
+	              ip=$OPENSHIFT_DIY_IP
+	              sed -i "s#<Server\s*port=\(\"8005\"\)\(.*\)#<Server address=\"$ip\" port=\"18005\" \2#g" server.xml
+	              sed -i "s#<Connector\s*port=\(\"8080\"\)\(.*\)#<Connector address=\"$ip\" port=\"8080\" \2#g;" server.xml
+	              sed -i "s#<Connector\s*port=\(\"8009\"\)\(.*\)#<Connector address=\"$ip\" port=\"18009\" \2#g" server.xml
+	              sed -i "s#redirectPort=\"8443\"#redirectPort=\"18443\"#g" server.xml
+fi
+
+
+cd $OPENSHIFT_REPO_DIR
+export M2=$OPENSHIFT_DATA_DIR/apache-maven-3.3.3/bin
+export MAVEN_OPTS="-Xms384m -Xmx412m"
+export JAVA_HOME=$OPENSHIFT_DATA_DIR/jdk1.8.0_73
+export TOMCAT_HOME=$OPENSHIFT_DATA_DIR/apache-tomcat-8.0.32
+export PATH=$JAVA_HOME/bin:$M2:$PATH
+
+mvn -s settings.xml clean package
+
+tmp=${TOMCAT_HOME}/tmp
+if [ -d $tmp ]; then
+  for d in $tmp/*; do
+      if [ -d $d ]; then
+          echo "Emptying tmp dir: $d"
+          rm -rf $d/* $d/.[^.]*
+      fi
+  done
+fi
+
+if [ -d ${TOMCAT_HOME}/work/ ]; then
+    rm -rf ${TOMCAT_HOME}/work/
+fi
+
+if [ "$(ls ${TOMCAT_HOME}/webapps 2>/dev/null)" ]; then
+  rm -Rf ${TOMCAT_HOME}/webapps/*
+  cp ${OPENSHIFT_REPO_DIR}/target/*.war ${TOMCAT_HOME}/webapps/ROOT.war
+fi

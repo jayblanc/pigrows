@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="${context}/css/bootstrap.min.css">
   <link href="${context}/css/styles.css" rel="stylesheet">  
   <title>Dispositifs</title>
 </head>
@@ -23,7 +23,8 @@
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
           <li><a href="${context}/api/html/devices">Dispositifs</a></li>
-          <li><a href="${context}/api/html/events">Événements</a></li>
+          <li><a href="${context}/api/html/events">&Eacute;v&eacute;nements</a></li>
+          <li><a href="${context}/api/html/config">Configuration</a></li>
         </ul>
       </div>
     </div>

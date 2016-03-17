@@ -2,15 +2,12 @@ package fr.jayblanc.pigrows;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.ClosedWatchServiceException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchEvent.Kind;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +16,6 @@ public class PiGrowsConfig {
     
     private static final Logger LOGGER = Logger.getLogger(PiGrowsConfig.class.getName());
     private static PiGrowsConfig config;
-    private WatchService watcher;
     private Properties props;
     private Path home;
 
@@ -37,19 +33,7 @@ public class PiGrowsConfig {
         LOGGER.log(Level.INFO, "PIGROWS_HOME set to : " + home);
 
         props = new Properties();
-        Path configFilePath = Paths.get(home.toString(), "config.properties");
-        if ( !Files.exists(configFilePath) ) {
-            Files.copy(PiGrowsConfig.class.getClassLoader().getResourceAsStream("config.properties"), configFilePath);
-        }
-        try (InputStream in = Files.newInputStream(configFilePath) ) {
-            props.load(in);
-        }
-        
-        watcher = home.getFileSystem().newWatchService();
-        WatchKey key = home.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
-        PiGrowsConfigReader configWatcher = new PiGrowsConfigReader(watcher, key);
-        Thread watcherThread = new Thread(configWatcher, "ConfigFileWatcher");
-        watcherThread.start();
+        init();
     }
 
     public static synchronized PiGrowsConfig getInstance() {
@@ -65,11 +49,6 @@ public class PiGrowsConfig {
     }
     
     public void shutdown() {
-        try {
-            watcher.close();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Unable to close File Watcher");
-        }
     }
 
     public Path getHomePath() {
@@ -79,6 +58,46 @@ public class PiGrowsConfig {
     public String getProperty(PiGrowsConfig.Property property) {
         return props.getProperty(property.key());
     }
+    
+    public void setProperty(PiGrowsConfig.Property property, String value) throws IOException {
+        props.setProperty(property.key(), value);
+        save();
+    }
+    
+    public void setProperties(Map<PiGrowsConfig.Property, String> properties) throws IOException {
+        for ( Entry<PiGrowsConfig.Property, String> entry : properties.entrySet() ) {
+            props.setProperty(entry.getKey().key(), entry.getValue());
+        }
+        save();
+    }
+    
+    public Properties listProperties() {
+        return props;
+    }
+    
+    private void init() throws IOException {
+        Path configFilePath = Paths.get(home.toString(), "config.properties");
+        if ( !Files.exists(configFilePath) ) {
+            Files.copy(PiGrowsConfig.class.getClassLoader().getResourceAsStream("config.properties"), configFilePath);
+        }
+        try (InputStream in = Files.newInputStream(configFilePath) ) {
+            props.load(in);
+        }
+    }
+    
+    private void load() throws IOException {
+        Path configFilePath = Paths.get(home.toString(), "config.properties");
+        try (InputStream in = Files.newInputStream(configFilePath) ) {
+            props.load(in);
+        }
+    }
+    
+    private void save() throws IOException {
+        Path configFilePath = Paths.get(home.toString(), "config.properties");
+        try (OutputStream out = Files.newOutputStream(configFilePath) ) {
+            props.store(out, "AUTO GENERATED FILE, DO NOT MODIFY MANUALLY");
+        }
+    }
 
     public enum Property {
 
@@ -87,8 +106,8 @@ public class PiGrowsConfig {
         SMTP_USER ("smtp.username"),
         SMTP_PASSWORD ("smtp.password"),
         
-        DATE_FORMAT_PATTERN ("date.format.pattern");
-
+        NOTIFICATION_RECIPIENTS ("notification.recipients");
+        
         private final String key;
 
         private Property(String name) {
@@ -101,48 +120,4 @@ public class PiGrowsConfig {
 
     }
     
-    private static class PiGrowsConfigReader implements Runnable {
-        
-        private WatchService service;
-        private WatchKey watchedKey;
-        
-        public PiGrowsConfigReader(WatchService watcher, WatchKey key) {
-            this.service = watcher;
-            this.watchedKey = key;
-        }
-        
-        @Override
-        public void run() {
-            try {
-                LOGGER.log(Level.INFO, "Starting Config Watcher Thread");
-                WatchKey key = null;
-                while(true) {
-                    key = service.take();
-                    if ( key.equals(watchedKey) ) {
-                        Kind<?> kind = null;
-                        for(WatchEvent<?> watchEvent : key.pollEvents()) {
-                            kind = watchEvent.kind();
-                            if (StandardWatchEventKinds.OVERFLOW == kind) {
-                                continue;
-                            } else if (StandardWatchEventKinds.ENTRY_MODIFY == kind) {
-                                @SuppressWarnings("unchecked")
-                                Path path = ((WatchEvent<Path>) watchEvent).context();
-                                LOGGER.log(Level.INFO, "Path modified: " + path);
-                            }
-                        }
-                        if(!key.reset()) {
-                            break; 
-                        }
-                    }
-                }
-            } catch (InterruptedException e) {
-                LOGGER.log(Level.SEVERE, "Config Watcher Thread Interrupted", e);
-            } catch (ClosedWatchServiceException e) {
-                LOGGER.log(Level.FINE, "WatcherService Closed");
-            }
-            LOGGER.log(Level.INFO, "Config Watcher Thread Stopped");
-        }
-    }
-
-
 }

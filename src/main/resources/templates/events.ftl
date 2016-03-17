@@ -1,7 +1,7 @@
 <#include "/common/head.ftl">
 
 <div class="starter-template">
-	<h2 class="page-header">Événements</h2>
+	<h2 class="page-header">&Eacute;v&eacute;nements</h2>
 	<#list events>
 		<table class="table table-hover">
 			<thead>
@@ -26,7 +26,7 @@
 			</tbody>
 		</table>
 	<#else>
-		<p>Il n'y a aucun évènement disponible</p>
+		<p>Il n'y a aucun &eacute;v&eagrave;nement disponible</p>
 	</#list>
 	<nav>
 		<#if nbpages gt 1>

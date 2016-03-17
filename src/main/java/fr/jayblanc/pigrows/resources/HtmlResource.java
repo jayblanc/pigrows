@@ -3,6 +3,8 @@ package fr.jayblanc.pigrows.resources;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
@@ -16,9 +18,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.glassfish.jersey.server.mvc.Template;
 
+import fr.jayblanc.pigrows.PiGrowsConfig;
+import fr.jayblanc.pigrows.PiGrowsConfig.Property;
 import fr.jayblanc.pigrows.service.DeviceAlreadyExistsException;
 import fr.jayblanc.pigrows.service.DeviceService;
 import fr.jayblanc.pigrows.service.EventService;
@@ -33,6 +38,8 @@ public class HtmlResource {
     private static DeviceService service = LocalFileDeviceService.getInstance();
     private static PictureService pictures = LocalFilePictureService.getInstance();
     private static EventService events = LocalFileEventService.getInstance();
+    private static PiGrowsConfig config = PiGrowsConfig.getInstance();
+    private static Random rand = new Random();
 
     @Context
     private ServletContext ctx;
@@ -62,11 +69,12 @@ public class HtmlResource {
     @Template(name = "/devices.ftl")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
-    public Map<String, Object> createDevice(@FormParam(value = "key") String key, @FormParam(value = "name") String name, @FormParam(value = "description") String description) {
+    public Map<String, Object> createDevice(@FormParam(value = "name") String name, @FormParam(value = "description") String description) {
         Map<String, Object> model = new HashMap<String, Object>();
         try {
+            String key = Integer.toHexString(rand.nextInt(16777215));
             service.create(key, name, description);
-            model.put("msg_success", "Le dispositif a été créé");
+            model.put("msg_success", "Le dispositif a été créé avec la clé: " + key);
         } catch (DeviceAlreadyExistsException e) {
             model.put("msg_error", "Impossible de créer le dispositif : une clé identique existe déjà");
         }
@@ -119,6 +127,46 @@ public class HtmlResource {
         model.put("page", page);
         model.put("size", size);
         model.put("events", events.find(key, (page-1) * size, size));
+        return model;
+    }
+    
+    @GET
+    @Path("/config")
+    @Template(name = "/config.ftl")
+    @Produces({ MediaType.TEXT_HTML })
+    public Map<String, Object> getConfig() throws IOException {
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("context", ctx.getContextPath());
+        Properties props = config.listProperties();
+        for ( String key : props.stringPropertyNames() ) {
+            model.put(key, props.get(key));
+        }
+        return model;
+    }
+    
+    @POST
+    @Path("/config")
+    @Template(name = "/config.ftl")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces({ MediaType.TEXT_HTML })
+    public Map<String, Object> setConfig(MultivaluedMap<String, String> params) throws IOException {
+        Map<String, Object> model = new HashMap<String, Object>();
+        try {
+            Map<Property, String> properties = new HashMap<Property, String>();
+            for ( String paramName : params.keySet() ) {
+                properties.put(Property.valueOf(paramName), params.getFirst(paramName));
+            }
+            config.setProperties(properties);
+            model.put("msg_success", "La configuration a été mise à jour");
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.put("msg_error", "Impossible de mettre à jour la configuration: " + e.getMessage());
+        }
+        model.put("context", ctx.getContextPath());
+        Properties props = config.listProperties();
+        for ( String key : props.stringPropertyNames() ) {
+            model.put(key, props.get(key));
+        }
         return model;
     }
     
