@@ -69,6 +69,6 @@ if [ -d ${TOMCAT_HOME}/work/ ]; then
 fi
 
 if [ "$(ls ${TOMCAT_HOME}/webapps 2>/dev/null)" ]; then
-  rm ${TOMCAT_HOME}/webapps/*
-  cp ${OPENSHIFT_REPO_DIR}/target/*.war ${TOMCAT_HOME}/webapps/
+  rm -Rf ${TOMCAT_HOME}/webapps/*
+  cp ${OPENSHIFT_REPO_DIR}/target/*.war ${TOMCAT_HOME}/webapps/ROOT.war
 fi
