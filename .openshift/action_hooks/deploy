@@ -5,19 +5,19 @@ set -x
 if [ ! -d $OPENSHIFT_DATA_DIR/m2/repository ]
         then
                 cd $OPENSHIFT_DATA_DIR
-				mkdir m2/repository                
+				        mkdir m2/repository
 fi
 
 if [ ! -d $OPENSHIFT_DATA_DIR/logs ]
         then
                 cd $OPENSHIFT_DATA_DIR
-				mkdir logs
+				        mkdir logs
 fi
 
 if [ ! -d $OPENSHIFT_DATA_DIR/jdk1.8.0_73 ]
         then
                 cd $OPENSHIFT_DATA_DIR
-		wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u73-b02/jdk-8u73-linux-x64.tar.gz
+		            wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u73-b02/jdk-8u73-linux-x64.tar.gz
                 tar xvf *.tar.gz
                 rm -f *.tar.gz
 fi
@@ -26,6 +26,14 @@ if [ ! -d $OPENSHIFT_DATA_DIR/apache-maven-3.3.3 ]
         then
                 cd $OPENSHIFT_DATA_DIR
                 wget http://mirror.cc.columbia.edu/pub/software/apache/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz
+                tar xvf *.tar.gz
+                rm -f *.tar.gz
+fi
+
+if [ ! -d $OPENSHIFT_DATA_DIR/apache-tomcat-8.0.32 ]
+        then
+                cd $OPENSHIFT_DATA_DIR
+                wget http://apache.websitebeheerjd.nl/tomcat/tomcat-8/v8.0.32/bin/apache-tomcat-8.0.32.tar.gz
                 tar xvf *.tar.gz
                 rm -f *.tar.gz
 fi
