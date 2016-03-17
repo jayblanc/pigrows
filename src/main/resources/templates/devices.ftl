@@ -7,10 +7,10 @@
 			<thead>
 				<tr>
 					<th>#</th>
-					<th>Clé</th>
+					<th>Cl&eacute;</th>
 					<th>Nom</th>
 					<th>Description</th>
-					<th>Derni&eagrave;re Activit&eacute;</th>
+					<th>Derni&egrave;re Activit&eacute;</th>
 					<th>Action</th>
 				</tr>
 			</thead>

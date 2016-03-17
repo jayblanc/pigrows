@@ -26,7 +26,7 @@
 			</tbody>
 		</table>
 	<#else>
-		<p>Il n'y a aucun &eacute;v&eagrave;nement disponible</p>
+		<p>Il n'y a aucun &eacute;v&egrave;nement disponible</p>
 	</#list>
 	<nav>
 		<#if nbpages gt 1>
