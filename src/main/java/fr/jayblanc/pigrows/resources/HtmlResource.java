@@ -1,7 +1,6 @@
 package fr.jayblanc.pigrows.resources;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -95,10 +94,27 @@ public class HtmlResource {
         model.put("folders", pictures.listFolders(key));
         return model;
     }
+    
+    @POST
+    @Path("/devices/{key}/purge")
+    @Template(name = "/devices.ftl")
+    @Produces({ MediaType.TEXT_HTML })
+    public Map<String, Object> purgeDevice(@PathParam("key") String key) throws Exception {
+        Map<String, Object> model = new HashMap<String, Object>();
+        try {
+            pictures.purgeAll(key);
+            model.put("msg_success", "Toutes les images du dispositif ont &eacute;t&eacute; supprim&eacute;s.");
+        } catch ( Exception e) {
+            model.put("msg_error", "Impossible de supprimer les images: " + e.getMessage());
+        }
+        model.put("devices", service.listAll());
+        model.put("context", ctx.getContextPath());
+        return model;
+    }
 
     @GET
     @Path("/devices/{key}/{folder}")
-    @Template(name = "/pictures.ftl")
+    @Template(name = "/folders.ftl")
     @Produces({ MediaType.TEXT_HTML })
     public Map<String, Object> getDeviceFolder(@PathParam("key") String key, @PathParam("folder") String folder, @DefaultValue("1") @QueryParam("p") int page,
             @DefaultValue("15") @QueryParam("size") int size) throws Exception {
@@ -112,6 +128,25 @@ public class HtmlResource {
         model.put("page", page);
         model.put("size", size);
         model.put("pictures", pictures.listPictures(key, folder, (page - 1) * size, size));
+        return model;
+    }
+    
+    @POST
+    @Path("/devices/{key}/{folder}/purge")
+    @Template(name = "/pictures.ftl")
+    @Produces({ MediaType.TEXT_HTML })
+    public Map<String, Object> purgeDeviceFolder(@PathParam("key") String key, @PathParam("folder") String folder, @DefaultValue("1") @QueryParam("p") int page,
+            @DefaultValue("15") @QueryParam("size") int size) throws Exception {
+        Map<String, Object> model = new HashMap<String, Object>();
+        try {
+            pictures.purgeFolder(key, folder);
+            model.put("msg_success", "Toutes les images du dossier ont &eacute;t&eacute; supprim&eacute;s.");
+        } catch ( Exception e) {
+            model.put("msg_error", "Impossible de supprimer les images: " + e.getMessage());
+        }
+        model.put("context", ctx.getContextPath());
+        model.put("key", key);
+        model.put("folders", pictures.listFolders(key));
         return model;
     }
 
