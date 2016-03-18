@@ -15,5 +15,7 @@ public interface EventService {
     List<Event> find(String key, int offset, int limit) throws IOException;
 
     String read(int offset, int limit) throws IOException;
+    
+    void purge() throws IOException;
 
 }

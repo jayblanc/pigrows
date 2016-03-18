@@ -78,4 +78,8 @@ public class LocalFileEventService implements EventService {
         return stream.map(s -> s.concat("\r\n")).collect(Collectors.joining());
     }
     
+    @Override
+    public void purge() throws IOException {
+        Files.write(store, new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
+    }
 }

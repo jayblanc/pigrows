@@ -44,14 +44,23 @@ public class ConfigResource {
     @GET
     @Path("/{key}/{camera}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public PictureParams getPictureParams(@PathParam("key") String key, @PathParam("camera") String camera) throws DeviceNotFoundException, NoContentException {
+    public String getPictureParams(@PathParam("key") String key, @PathParam("camera") String camera) throws DeviceNotFoundException, NoContentException {
         Device device = devices.get(key);
+        PictureParams params;
         if ( camera.equals("master") ) {
-            return device.getMasterPictureConfig();
+            params = device.getMasterPictureConfig();
+        } else if ( camera.equals("slave") ) {
+            params = device.getSlavePictureConfig();
+        } else {
+            throw new NoContentException("no camera found with name: " + camera);
         }
-        if ( camera.equals("slave") ) {
-            return device.getSlavePictureConfig();
-        }
-        throw new NoContentException("no camera found with name: " + camera);
+        StringBuilder sb = new StringBuilder();
+        sb.append(" -sh ").append(params.getSharpness());
+        sb.append(" -co ").append(params.getContrast());
+        sb.append(" -br ").append(params.getBrightness());
+        sb.append(" -sa ").append(params.getSaturation());
+        sb.append(" -ISO ").append(params.getISO());
+        sb.append(" -awb ").append(params.getWb().name());
+        return sb.toString();
     }
 }

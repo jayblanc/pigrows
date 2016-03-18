@@ -1,6 +1,7 @@
 package fr.jayblanc.pigrows.resources;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -130,6 +131,28 @@ public class HtmlResource {
         return model;
     }
     
+    @POST
+    @Path("/events/purge")
+    @Template(name = "/events.ftl")
+    @Produces({ MediaType.TEXT_HTML })
+    public Map<String, Object> purgeEvents(@QueryParam("key") String key, @DefaultValue("1") @QueryParam("p") int page, @DefaultValue("15") @QueryParam("size") int size) throws IOException {
+        Map<String, Object> model = new HashMap<String, Object>();
+        try {
+            events.purge();
+            model.put("msg_success", "Tous les &eacute;v&egrave;nements ont &eacute;t&eacute; supprim&eacute;s.");
+        } catch ( Exception e) {
+            model.put("msg_error", "Impossible de supprimer les &eacute;v&egrave;nements: " + e.getMessage());
+        }
+        model.put("context", ctx.getContextPath());
+        long nbevents = events.count(key);
+        model.put("total", nbevents);
+        model.put("nbpages", nbevents / size + 1);
+        model.put("page", page);
+        model.put("size", size);
+        model.put("events", events.find(key, (page-1) * size, size));
+        return model;
+    }
+    
     @GET
     @Path("/config")
     @Template(name = "/config.ftl")
@@ -157,10 +180,10 @@ public class HtmlResource {
                 properties.put(Property.valueOf(paramName), params.getFirst(paramName));
             }
             config.setProperties(properties);
-            model.put("msg_success", "La configuration a été mise à jour");
+            model.put("msg_success", "La configuration a &eacute;t&eacute; mise &agrave; jour");
         } catch (Exception e) {
             e.printStackTrace();
-            model.put("msg_error", "Impossible de mettre à jour la configuration: " + e.getMessage());
+            model.put("msg_error", "Impossible de mettre &agrave; jour la configuration: " + e.getMessage());
         }
         model.put("context", ctx.getContextPath());
         Properties props = config.listProperties();

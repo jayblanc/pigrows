@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -66,6 +67,12 @@ public class PictureResource {
         return builder.build();
     }
 
+    @DELETE
+    @Path("/{key}")
+    public Response purgeDevice(@PathParam("key") String key) throws Exception {
+        pictures.purgeAll(key);
+        return Response.ok().build();
+    }
     @GET
     @Path("/{key}/{folder}")
     public Response getDeviceFolder(@PathParam("key") String key, @PathParam("folder") String folder) throws Exception {
@@ -77,6 +84,13 @@ public class PictureResource {
         };
         builder.entity(stream);
         return builder.build();
+    }
+    
+    @DELETE
+    @Path("/{key}/{folder}")
+    public Response purgeDeviceFolder(@PathParam("key") String key, @PathParam("folder") String folder) throws Exception {
+        pictures.purgeFolder(key, folder);
+        return Response.ok().build();
     }
 
     @GET

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -15,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import fr.jayblanc.pigrows.model.Event;
 import fr.jayblanc.pigrows.service.LocalFileEventService;
@@ -31,6 +33,13 @@ public class EventResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public List<Event> listAll(@DefaultValue("0") @QueryParam("offset") int offset, @DefaultValue("1000") @QueryParam("limit") int limit) throws IOException {
         return service.find(null, offset, limit);
+    }
+    
+    @DELETE
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response purgeAll() throws IOException {
+        service.purge();
+        return Response.ok().build();
     }
     
     @GET
@@ -51,8 +60,5 @@ public class EventResource {
     public void appendParams(@PathParam("key") String key, @QueryParam("type") String type, @QueryParam("message") String message) throws IOException {
         service.append(key, type, message);
     }
-    
-    
-    
     
 }

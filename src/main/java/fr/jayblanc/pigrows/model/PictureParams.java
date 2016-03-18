@@ -83,12 +83,12 @@ public class PictureParams {
         this.exposure = exposure;
     }
 
-    public WhiteBalance isAwb() {
+    public WhiteBalance getWb() {
         return whiteBalance;
     }
 
-    public void setAwb(WhiteBalance awb) {
-        this.whiteBalance = awb;
+    public void setWb(WhiteBalance wb) {
+        this.whiteBalance = wb;
     }
     
     public enum WhiteBalance {
