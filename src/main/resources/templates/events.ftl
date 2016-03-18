@@ -2,7 +2,7 @@
 
 <div class="starter-template">
 	<h2 class="page-header">&Eacute;v&eacute;nements</h2>
-	<form action="${context}/events/purge" method="post">
+	<form action="${context}/api/html/events/purge" method="post">
 		<button type="submit" class="btn btn-primary">Purger</button>
 	</form>
 	<#list events>
