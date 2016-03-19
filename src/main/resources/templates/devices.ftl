@@ -22,10 +22,14 @@
 						<td>${device.name}</td>
 						<td>${device.description}</td>
 						<td>${device.lastActivity?number_to_datetime}</td>
-						<td width="100px">
-							<a class="btn btn-default btn-sm" href="${context}/api/html/devices/${device.key}" role="button"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span></a>
-							<a class="btn btn-default btn-sm" href="${context}/api/pictures/${device.key}" role="button"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
-						</td>
+						<form action="${context}/api/html/devices/${device.key}/purge" method="post">
+							<td width="200px">
+								<a class="btn btn-default btn-sm" href="${context}/api/html/devices/${device.key}" role="button" title="Parcourir les images"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span></a>
+								<a class="btn btn-default btn-sm" href="${context}/api/pictures/${device.key}" role="button" title="T&eacute;l&eacute;charger une archive de toutes les images"><span class="glyphicon glyphicon-compressed" aria-hidden="true"></span></a>
+								<a class="btn btn-default btn-sm" role="button" title="Configurer le dispositif"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span></a>
+								<a class="btn btn-danger btn-sm" onclick="$('#purgeForm').attr('action', '${context}/api/html/devices/${device.key}/purge');$('#confirmModal').modal('show')" role="button" title="Purger toutes les images"><span class="glyphicon glyphicon-trash"></span></a>
+							</td>
+						</form>
 					</tr>
 				</#items>
 			</tbody>
@@ -68,6 +72,26 @@
 					<button type="submit" class="btn btn-primary">Cr&eacute;er</button>
 				</div>
 			</form>  
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="post" id="purgeForm">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Effacer toutes les images ?</h4>
+				</div>
+				<div class="modal-body">
+					<p>Confirmez vous vouloir <b>EFFACER TOUTES LES IMAGES DU DISPOSITIF</b> ?<br/>
+					<small>Cette action ne peut pas &ecirc;tre annul&eacute;e.</small></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+					<button type="submit" class="btn btn-danger">Confirmer</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>

@@ -76,6 +76,6 @@ public class Event {
     }
 
     public enum EventType {
-        START, ERROR, SUCCESS
+        WAKEUP, START, ACTION, ERROR, SUCCESS, SHUTDOWN
     }
 }

@@ -114,7 +114,7 @@ public class HtmlResource {
 
     @GET
     @Path("/devices/{key}/{folder}")
-    @Template(name = "/folders.ftl")
+    @Template(name = "/pictures.ftl")
     @Produces({ MediaType.TEXT_HTML })
     public Map<String, Object> getDeviceFolder(@PathParam("key") String key, @PathParam("folder") String folder, @DefaultValue("1") @QueryParam("p") int page,
             @DefaultValue("15") @QueryParam("size") int size) throws Exception {
@@ -133,7 +133,7 @@ public class HtmlResource {
     
     @POST
     @Path("/devices/{key}/{folder}/purge")
-    @Template(name = "/pictures.ftl")
+    @Template(name = "/folders.ftl")
     @Produces({ MediaType.TEXT_HTML })
     public Map<String, Object> purgeDeviceFolder(@PathParam("key") String key, @PathParam("folder") String folder, @DefaultValue("1") @QueryParam("p") int page,
             @DefaultValue("15") @QueryParam("size") int size) throws Exception {

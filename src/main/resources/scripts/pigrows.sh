@@ -13,65 +13,87 @@
 # Jérôme Blanchard <jayblanc@gmail.com>
 #
 
-set -u
+#set -u
 
-SERVER_URL=http://pigrows-jayblanc.rhcloud.com
-SERVER_USERNAME=pigrows
+SERVER_URL=http://localhost:8080/pigrows
+SERVER_USERNAME=admin
 SERVER_PASSWORD=tagada54
-DEVICE_KEY=6e5a0d
+DEVICE_KEY=bf60d3
 SESSION_ID=$RANDOM
+PIGROWS_HOME=/tmp/pigrows
+SLAVE_USER=jerome
+SLAVE_HOST=localhost
+VIEW_BASE_CMD="streamer -c /dev/video0 -b 16" 
+#VIEW_BASE_CMD="raspistill -vf -hf"
 
+#Créer les dossiers qui n'existeraient pas
+if [ ! -d $PIGROWS_HOME/views ]; then
+    mkdir -p $PIGROWS_HOME/views;
+fi
+if [ ! -d $PIGROWS_HOME/archives ]; then
+    mkdir -p $PIGROWS_HOME/archives;
+fi
 
 #Démarrer le log de la session (assigner un session ID)
-echo "Starting session ${SESSION_ID}" >> /var/log/pigrows.log
+echo "Starting session ${SESSION_ID}" >> ${PIGROWS_HOME}/pigrows.log
 
 
 #Etablir la connexion 3G
-echo "#${SESSION_ID}> connecting to 4G..." >> /var/log/pigrows.log
-echo "#${SESSION_ID}> 4G connected." >> /var/log/pigrows.log
+echo "#${SESSION_ID}> connecting to 4G..." >> ${PIGROWS_HOME}/pigrows.log
+echo "#${SESSION_ID}> 4G connected." >> ${PIGROWS_HOME}/pigrows.log
 
 
 #Poster une évènement de démarrage de prise de vue sur le serveur
-echo "#${SESSION_ID}> sending start event to server..." >> /var/log/pigrows.log
-response=$curl ${SERVER_URL}/api/events/${DEVICE_KEY} -u ${SERVER_USERNAME}:${SERVER_PASSWORD} -d "type=START&message=Starting session ${SESSION_ID}"
-if [ $? -ne 0 ]; then
-  echo "#${SESSION_ID}> ERROR unable to sent event to server !!" >> /var/log/pigrows.log
-  ## TODO Try a ping to check server connectivity !!
-else
-  echo "#${SESSION_ID}> event sent." >> /var/log/pigrows.log
-fi
+echo "#${SESSION_ID} (`uptime`)> sending wake up event to server..." >> ${PIGROWS_HOME}/pigrows.log
+curl ${SERVER_URL}/api/events/${DEVICE_KEY} -u ${SERVER_USERNAME}:${SERVER_PASSWORD} -d "type=START&message=Starting session ${SESSION_ID}"
+echo "#${SESSION_ID}> start event sent to server" >> ${PIGROWS_HOME}/pigrows.log
 
 
 #Récupérer la commande de prise de vue sur le serveur
-echo "#${SESSION_ID}> getting camera params from server..." >> /var/log/pigrows.log
-curl ${SERVER_URL}/api/config/${DEVICE_KEY}/master -u ${SERVER_USERNAME}:${SERVER_PASSWORD} 
-if [ $? -ne 0 ]; then
-  echo "#${SESSION_ID}> ERROR unable to get master camera params from server !!" >> /var/log/pigrows.log
-else
-  echo "#${SESSION_ID}> master camera params retreived." >> /var/log/pigrows.log
-fi
-
+echo "#${SESSION_ID} (`uptime`)> getting camera params from server..." >> ${PIGROWS_HOME}/pigrows.log
+MASTER_VIEW_PARAMS=$(curl ${SERVER_URL}/api/config/${DEVICE_KEY}/master -u ${SERVER_USERNAME}:${SERVER_PASSWORD})
+SLAVE_VIEW_PARAMS=$(curl ${SERVER_URL}/api/config/${DEVICE_KEY}/slave -u ${SERVER_USERNAME}:${SERVER_PASSWORD}) 
 VIEW_ID=`date +%Y-%m-%dT%H:%M:%S`
-
-MASTER_VIEW_CMD="raspistill -vf -hf ${MASTER_VIEW_PARAMS} -o ${VIEW_ID}.master.jpg"
-SLAVE_VIEW_CMD="raspistill -vf -hf ${SLAVE_VIEW_PARAMS} -o ${VIEW_ID}.master.jpg"
+#MASTER_VIEW_CMD="${VIEW_BASE_CMD} ${MASTER_VIEW_PARAMS} -o ${PIGROWS_HOME}/views/${VIEW_ID}.master.jpeg"
+MASTER_VIEW_CMD="${VIEW_BASE_CMD} -o ${PIGROWS_HOME}/views/${VIEW_ID}.master.jpeg"
+#SLAVE_VIEW_CMD="${VIEW_BASE_CMD} ${SLAVE_VIEW_PARAMS} -o current.jpeg"
+SLAVE_VIEW_CMD="${VIEW_BASE_CMD} -o current.jpeg"
+echo "#${SESSION_ID}> camera params retreived from server" >> ${PIGROWS_HOME}/pigrows.log
 
 
 #Se connecter en SSH au slave et récupérer la photo
-ssh pi@slave $COMMAND_TAKE_VIEW_SLAVE
-scp pi@slave:/home/pi/current.jpg ./views/slave/`FILE FORMAT`.jpg
-ssh pi@slave $COMMAND_PURGE_VIEWS_SLAVE $COMMAND_SHUTDOWN
+echo "#${SESSION_ID} (`uptime`)> starting remote picture acquisition..." >> ${PIGROWS_HOME}/pigrows.log
+ssh ${SLAVE_USER}@${SLAVE_HOST} $SLAVE_VIEW_CMD
+scp ${SLAVE_USER}@${SLAVE_HOST}:~/current.jpeg ${PIGROWS_HOME}/views/${VIEW_ID}.slave.jpeg
+echo "#${SESSION_ID}> remote picture acquired" >> ${PIGROWS_HOME}/pigrows.log
+
+
+#Eteindre l'esclave
+echo "#${SESSION_ID} (`uptime`)> shutting down slave..." >> ${PIGROWS_HOME}/pigrows.log
+#ssh $SLAVE_USER@$SLAVE_HOST echo "tagada54" | sudo shutdown -h now
+echo "#${SESSION_ID}> slave shutdown" >> ${PIGROWS_HOME}/pigrows.log
+
 
 #Prendre une prise de vue locale
-$COMMAND_TAKE_VIEW_MASTER ./views/master/`FILE_FORMAT`.jpg
+echo "#${SESSION_ID} (`uptime`)> starting local picture acquisition..." >> ${PIGROWS_HOME}/pigrows.log
+$MASTER_VIEW_CMD
+echo "#${SESSION_ID}> local picture acquired" >> ${PIGROWS_HOME}/pigrows.log
 
-#Déverser les dernières prises de vues sur le serveur
 
+#Déverser les prises de vues non encore versées sur le serveur, et les déplacer dans le dossier d'archive
+echo "#${SESSION_ID} (`uptime`)> starting uploading pending pictures..." >> ${PIGROWS_HOME}/pigrows.log
+for view in `ls ${PIGROWS_HOME}/views` 
+do
+	echo "#${SESSION_ID} (`uptime`)> starting picture upload [${PIGROWS_HOME}/views/${view}]..." >> ${PIGROWS_HOME}/pigrows.log
+	curl -F file=@${PIGROWS_HOME}/views/${view} ${SERVER_URL}/api/pictures/${DEVICE_KEY} -u admin:tagada54
+	mv ${PIGROWS_HOME}/views/${view} ${PIGROWS_HOME}/archives/${view}
+	echo "#${SESSION_ID} (`uptime`)> picture upload done [${PIGROWS_HOME}/views/${view}]" >> ${PIGROWS_HOME}/pigrows.log
+done
+echo "#${SESSION_ID}> all pending pictures uploaded..." >> ${PIGROWS_HOME}/pigrows.log
 
-#Vérifier l'intégrité des fichiers versés
 
 #Générer un rapport d'état du déroulement du cycle
-
-#Purger les prises de vues trop anciennes
+echo "#${SESSION_ID} (`uptime`)> Everything is done, halting" >> ${PIGROWS_HOME}/pigrows.log
+#shutdown -h now
 
 

@@ -46,6 +46,7 @@ public class PictureResource {
         try {
             devices.get(key);
             pictures.store(key, fileMetaData.getFileName(), fileInputStream);
+            devices.updateActivity(key);
         } catch (DeviceNotFoundException e) {
             return Response.status(Status.BAD_REQUEST).entity("device key does not exists").build();
         } catch (IOException e) {
