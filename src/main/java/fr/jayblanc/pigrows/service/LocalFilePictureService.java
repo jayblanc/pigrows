@@ -202,7 +202,7 @@ public class LocalFilePictureService implements PictureService {
     }
     
     private int compareNames(Path p1, Path p2) {
-        return p1.getFileName().compareTo(p2.getFileName());
+        return p2.getFileName().compareTo(p1.getFileName());
     }
 
 }
