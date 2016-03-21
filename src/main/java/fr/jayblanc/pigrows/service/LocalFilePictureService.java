@@ -74,7 +74,7 @@ public class LocalFilePictureService implements PictureService {
     public List<Picture> listPictures(String key, String folder, int offset, int limit) throws IOException {
         LOGGER.log(Level.INFO, "listing pictures for key/folder: " + key + "/" + folder);
         Path path = Paths.get(store.toString(), key, folder);
-        return Files.list(path).skip(offset).limit(limit).map(this::pathToPicture).collect(Collectors.toList());
+        return Files.list(path).sorted((p1, p2) -> compareTime(p1, p2)).skip(offset).limit(limit).map(this::pathToPicture).collect(Collectors.toList());
     }
 
     @Override
@@ -189,6 +189,14 @@ public class LocalFilePictureService implements PictureService {
             Files.delete(source);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "unable to walk source path", e);
+        }
+    }
+    
+    private int compareTime(Path p1, Path p2) {
+        try {
+            return Long.compare(Files.getLastModifiedTime(p1).toMillis(), Files.getLastModifiedTime(p2).toMillis());
+        } catch ( Exception e ) {
+            return 0;
         }
     }
 

@@ -18,7 +18,7 @@ public class CameraConfig {
     @Min(-10) @Max(10)
     private int ev = 0;
     @Min(100) @Max(800)
-    private int iso = 200;
+    private int iso = 100;
     private Exposure exposure = Exposure.AUTO;
     private WhiteBalance whiteBalance = WhiteBalance.AUTO;
 
