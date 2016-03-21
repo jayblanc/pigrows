@@ -44,26 +44,34 @@ public class LocalFileEventService implements EventService {
     
     @Override
     public long count(String key) throws IOException {
-        Stream<Event> stream = Files.lines(store).map(Event::deserialize);
-        if ( key != null && key.length() > 0 ) {
-            stream = stream.filter(e -> e.getKey().equals(key));
+        try (Stream<String> lines = Files.lines(store)) {
+            Stream<Event> stream = lines.map(Event::deserialize);
+            if ( key != null && key.length() > 0 ) {
+                stream = stream.filter(e -> e.getKey().equals(key));
+            }
+            long count = stream.count();
+            stream.close();
+            return count;
         }
-        return stream.count();
     }
     
     @Override
     public List<Event> find(String key, int offset, int limit) throws IOException {
-        Stream<Event> stream = Files.lines(store).map(Event::deserialize);
-        if ( key != null && key.length() > 0 ) {
-            stream = stream.filter(e -> e.getKey().equals(key));
+        try (Stream<String> lines = Files.lines(store)) {
+            Stream<Event> stream = lines.map(Event::deserialize);
+            if ( key != null && key.length() > 0 ) {
+                stream = stream.filter(e -> e.getKey().equals(key));
+            }
+            if ( offset > 0 ) {
+                stream = stream.skip(offset);
+            }
+            if ( limit > 0 ) {
+                stream = stream.limit(limit);
+            }
+            List<Event> sendback = stream.collect(Collectors.toList());
+            stream.close();
+            return sendback;
         }
-        if ( offset > 0 ) {
-            stream = stream.skip(offset);
-        }
-        if ( limit > 0 ) {
-            stream = stream.limit(limit);
-        }
-        return stream.collect(Collectors.toList());
     }
 
     @Override
@@ -75,7 +83,9 @@ public class LocalFileEventService implements EventService {
         if ( limit > 0 ) {
             stream = stream.limit(limit);
         }
-        return stream.map(s -> s.concat("\r\n")).collect(Collectors.joining());
+        String sendback =  stream.map(s -> s.concat("\r\n")).collect(Collectors.joining());
+        stream.close();
+        return sendback;
     }
     
     @Override

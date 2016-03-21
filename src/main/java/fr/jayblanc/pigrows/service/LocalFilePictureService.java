@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -60,21 +61,27 @@ public class LocalFilePictureService implements PictureService {
     public long count(String key, String folder) throws IOException {
         LOGGER.log(Level.INFO, "counting pictures for key/folder: " + key + "/" + folder);
         Path path = Paths.get(store.toString(), key, folder);
-        return Files.list(path).count();
+        try ( Stream<Path> stream = Files.list(path) ) {
+            return stream.count();
+        }
     }
 
     @Override
     public List<Folder> listFolders(String key) throws IOException {
         LOGGER.log(Level.INFO, "listing folders for key: " + key);
         Path path = Paths.get(store.toString(), key);
-        return Files.list(path).map(this::pathToFolder).collect(Collectors.toList());
+        try ( Stream<Path> stream = Files.list(path) ) {
+            return stream.map(this::pathToFolder).collect(Collectors.toList());
+        }
     }
 
     @Override
     public List<Picture> listPictures(String key, String folder, int offset, int limit) throws IOException {
         LOGGER.log(Level.INFO, "listing pictures for key/folder: " + key + "/" + folder);
         Path path = Paths.get(store.toString(), key, folder);
-        return Files.list(path).sorted((p1, p2) -> compareTime(p1, p2)).skip(offset).limit(limit).map(this::pathToPicture).collect(Collectors.toList());
+        try ( Stream<Path> stream = Files.list(path) ) {
+            return stream.sorted((p1, p2) -> compareTime(p1, p2)).skip(offset).limit(limit).map(this::pathToPicture).collect(Collectors.toList());
+        }
     }
 
     @Override
@@ -123,7 +130,9 @@ public class LocalFilePictureService implements PictureService {
     public void purgeAll(String key) throws IOException {
         LOGGER.log(Level.INFO, "purge all folders: " + key);
         Path pp = Paths.get(store.toString(), key);
-        Files.walk(pp).filter(path -> Files.isDirectory(path)).forEach(path -> purge(pp));
+        try ( Stream<Path> stream = Files.walk(pp) ) {
+            stream.filter(path -> Files.isDirectory(path)).forEach(path -> purge(pp));
+        }
     }
     
     private Folder pathToFolder(Path path) {
@@ -160,8 +169,8 @@ public class LocalFilePictureService implements PictureService {
     }
 
     private void pack(Path source, ZipOutputStream zos) {
-        try {
-            Files.walk(source).filter(path -> !Files.isDirectory(path)).forEach(path -> {
+        try (Stream<Path> stream = Files.walk(source) ) {
+            stream.filter(path -> !Files.isDirectory(path)).forEach(path -> {
                 String sp = path.toAbsolutePath().toString().replace(source.toAbsolutePath().toString(), "").replace(path.getFileName().toString(), "");
                 ZipEntry zipEntry = new ZipEntry(sp + path.getFileName().toString());
                 try {
@@ -178,8 +187,8 @@ public class LocalFilePictureService implements PictureService {
     }
     
     private void purge(Path source) {
-        try {
-            Files.walk(source).filter(path -> !Files.isDirectory(path)).forEach(path -> {
+        try (Stream<Path> stream = Files.walk(source)) {
+            stream.filter(path -> !Files.isDirectory(path)).forEach(path -> {
                 try {
                     Files.delete(path);
                 } catch (Exception e) {
