@@ -55,12 +55,15 @@ public class ConfigResource {
             throw new NoContentException("no camera found with name: " + camera);
         }
         StringBuilder sb = new StringBuilder();
+        sb.append(" -q ").append(params.getQuality());
         sb.append(" -sh ").append(params.getSharpness());
         sb.append(" -co ").append(params.getContrast());
         sb.append(" -br ").append(params.getBrightness());
         sb.append(" -sa ").append(params.getSaturation());
         sb.append(" -ISO ").append(params.getIso());
-        sb.append(" -awb ").append(params.getWb().name());
+        sb.append(" -ev ").append(params.getEv());
+        sb.append(" -ex ").append(params.getExposure().name().toLowerCase());
+        sb.append(" -awb ").append(params.getWb().name().toLowerCase());
         return sb.toString();
     }
 }
