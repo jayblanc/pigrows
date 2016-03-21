@@ -1,28 +1,39 @@
 package fr.jayblanc.pigrows.model;
 
-public class PictureParams {
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
-    private int quality = 90;
+public class CameraConfig {
+
+    @Min(0) @Max(100)
+    private int quality = 95;
+    @Min(-100) @Max(100)
     private int sharpness = 0;
+    @Min(-100) @Max(100)
     private int contrast = 0;
-    private int brightness = 0;
+    @Min(0) @Max(100)
+    private int brightness = 50;
+    @Min(-100) @Max(100)
     private int saturation = 0;
-    private int ISO = 200;
-    private int exposure = 0;
+    @Min(-10) @Max(10)
+    private int ev = 0;
+    @Min(100) @Max(800)
+    private int iso = 200;
+    private Exposure exposure = Exposure.AUTO;
     private WhiteBalance whiteBalance = WhiteBalance.AUTO;
 
-    public PictureParams() {
+    public CameraConfig() {
         super();
     }
 
-    public PictureParams(int quality, int sharpness, int contrast, int brightness, int saturation, int iSO, int exposure, WhiteBalance wb) {
+    public CameraConfig(int quality, int sharpness, int contrast, int brightness, int saturation, int iso, Exposure exposure, WhiteBalance wb) {
         super();
         this.quality = quality;
         this.sharpness = sharpness;
         this.contrast = contrast;
         this.brightness = brightness;
         this.saturation = saturation;
-        ISO = iSO;
+        this.iso = iso;
         this.exposure = exposure;
         this.whiteBalance = wb;
     }
@@ -67,19 +78,27 @@ public class PictureParams {
         this.saturation = saturation;
     }
 
-    public int getISO() {
-        return ISO;
+    public int getIso() {
+        return iso;
     }
 
-    public void setISO(int iSO) {
-        ISO = iSO;
+    public void setIso(int iso) {
+        this.iso = iso;
     }
 
-    public int getExposure() {
+    public int getEv() {
+        return ev;
+    }
+
+    public void setEv(int ev) {
+        this.ev = ev;
+    }
+
+    public Exposure getExposure() {
         return exposure;
     }
 
-    public void setExposure(int exposure) {
+    public void setExposure(Exposure exposure) {
         this.exposure = exposure;
     }
 
@@ -89,6 +108,10 @@ public class PictureParams {
 
     public void setWb(WhiteBalance wb) {
         this.whiteBalance = wb;
+    }
+    
+    public enum Exposure {
+        AUTO, NIGHT, BACKLIGHT, SPORTS, SNOW, BEACH, VERYLONG, FIXEDFPS, ANTISHAKE, FIREWORKS
     }
     
     public enum WhiteBalance {

@@ -1,5 +1,6 @@
 package fr.jayblanc.pigrows.service;
 
+@SuppressWarnings("serial")
 public class InvalidFilenameFormatException extends Exception {
 
     public InvalidFilenameFormatException() {

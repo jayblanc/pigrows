@@ -16,7 +16,7 @@ import javax.ws.rs.core.NoContentException;
 
 import fr.jayblanc.pigrows.PiGrowsConfig;
 import fr.jayblanc.pigrows.model.Device;
-import fr.jayblanc.pigrows.model.PictureParams;
+import fr.jayblanc.pigrows.model.CameraConfig;
 import fr.jayblanc.pigrows.service.DeviceNotFoundException;
 import fr.jayblanc.pigrows.service.DeviceService;
 import fr.jayblanc.pigrows.service.LocalFileDeviceService;
@@ -46,11 +46,11 @@ public class ConfigResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getPictureParams(@PathParam("key") String key, @PathParam("camera") String camera) throws DeviceNotFoundException, NoContentException {
         Device device = devices.get(key);
-        PictureParams params;
+        CameraConfig params;
         if ( camera.equals("master") ) {
-            params = device.getMasterPictureConfig();
+            params = device.getMasterConfig();
         } else if ( camera.equals("slave") ) {
-            params = device.getSlavePictureConfig();
+            params = device.getSlaveConfig();
         } else {
             throw new NoContentException("no camera found with name: " + camera);
         }
@@ -59,7 +59,7 @@ public class ConfigResource {
         sb.append(" -co ").append(params.getContrast());
         sb.append(" -br ").append(params.getBrightness());
         sb.append(" -sa ").append(params.getSaturation());
-        sb.append(" -ISO ").append(params.getISO());
+        sb.append(" -ISO ").append(params.getIso());
         sb.append(" -awb ").append(params.getWb().name());
         return sb.toString();
     }

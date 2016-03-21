@@ -7,8 +7,8 @@ public class Device {
     private String description;
     private long registration;
     private long lastActivity;
-    private PictureParams masterPictureConfig;
-    private PictureParams slavePictureConfig;
+    private CameraConfig masterConfig;
+    private CameraConfig slaveConfig;
     private boolean configChanged = false;
 
     public Device(String key, String name, String description) {
@@ -18,8 +18,8 @@ public class Device {
         this.description = description;
         this.registration = System.currentTimeMillis();
         this.lastActivity = this.registration;
-        masterPictureConfig = new PictureParams();
-        slavePictureConfig = new PictureParams();
+        masterConfig = new CameraConfig();
+        slaveConfig = new CameraConfig();
     }
 
     public String getKey() {
@@ -70,20 +70,20 @@ public class Device {
         this.configChanged = configChanged;
     }
 
-    public PictureParams getMasterPictureConfig() {
-        return masterPictureConfig;
+    public CameraConfig getMasterConfig() {
+        return masterConfig;
     }
 
-    public void setMasterPictureConfig(PictureParams masterPictureConfig) {
-        this.masterPictureConfig = masterPictureConfig;
+    public void setMasterConfig(CameraConfig masterConfig) {
+        this.masterConfig = masterConfig;
     }
 
-    public PictureParams getSlavePictureConfig() {
-        return slavePictureConfig;
+    public CameraConfig getSlaveConfig() {
+        return slaveConfig;
     }
 
-    public void setSlavePictureConfig(PictureParams slavePictureConfig) {
-        this.slavePictureConfig = slavePictureConfig;
+    public void setSlaveConfig(CameraConfig slaveConfig) {
+        this.slaveConfig = slaveConfig;
     }
 
 }

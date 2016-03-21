@@ -24,6 +24,9 @@ import org.glassfish.jersey.server.mvc.Template;
 
 import fr.jayblanc.pigrows.PiGrowsConfig;
 import fr.jayblanc.pigrows.PiGrowsConfig.Property;
+import fr.jayblanc.pigrows.model.CameraConfig;
+import fr.jayblanc.pigrows.model.CameraConfig.Exposure;
+import fr.jayblanc.pigrows.model.CameraConfig.WhiteBalance;
 import fr.jayblanc.pigrows.service.DeviceAlreadyExistsException;
 import fr.jayblanc.pigrows.service.DeviceService;
 import fr.jayblanc.pigrows.service.EventService;
@@ -92,6 +95,44 @@ public class HtmlResource {
         model.put("context", ctx.getContextPath());
         model.put("key", key);
         model.put("folders", pictures.listFolders(key));
+        return model;
+    }
+    
+    @POST
+    @Path("/devices/{key}/config")
+    @Template(name = "/devices.ftl")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces({ MediaType.TEXT_HTML })
+    public Map<String, Object> setDeviceConfig(@PathParam("key") String key, MultivaluedMap<String, String> form) throws Exception {
+        Map<String, Object> model = new HashMap<String, Object>();
+        try {
+            CameraConfig master = new CameraConfig();
+            master.setQuality(Integer.parseInt(form.getFirst("master_quality")));
+            master.setSharpness(Integer.parseInt(form.getFirst("master_sharpness")));
+            master.setContrast(Integer.parseInt(form.getFirst("master_contrast")));
+            master.setBrightness(Integer.parseInt(form.getFirst("master_brightness")));
+            master.setSaturation(Integer.parseInt(form.getFirst("master_saturation")));
+            master.setEv(Integer.parseInt(form.getFirst("master_ev")));
+            master.setIso(Integer.parseInt(form.getFirst("master_iso")));
+            master.setExposure(Exposure.valueOf(form.getFirst("master_exposure")));
+            master.setWb(WhiteBalance.valueOf(form.getFirst("master_wb")));
+            CameraConfig slave = new CameraConfig();
+            slave.setQuality(Integer.parseInt(form.getFirst("slave_quality")));
+            slave.setSharpness(Integer.parseInt(form.getFirst("slave_sharpness")));
+            slave.setContrast(Integer.parseInt(form.getFirst("slave_contrast")));
+            slave.setBrightness(Integer.parseInt(form.getFirst("slave_brightness")));
+            slave.setSaturation(Integer.parseInt(form.getFirst("slave_saturation")));
+            slave.setEv(Integer.parseInt(form.getFirst("slave_ev")));
+            slave.setIso(Integer.parseInt(form.getFirst("slave_iso")));
+            slave.setExposure(Exposure.valueOf(form.getFirst("slave_exposure")));
+            slave.setWb(WhiteBalance.valueOf(form.getFirst("slave_wb")));
+            service.updateConfig(key, master, slave);
+            model.put("msg_success", "La configuration du dispositif a &eacute;t&eacute; mise &agrave; jour.");
+        } catch ( Exception e) {
+            model.put("msg_error", "Impossible de mettre &agrave; jour la configuration: " + e.getMessage());
+        }
+        model.put("devices", service.listAll());
+        model.put("context", ctx.getContextPath());
         return model;
     }
     

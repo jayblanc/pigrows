@@ -8,8 +8,14 @@ import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.xml.bind.ValidationException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,12 +23,14 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import fr.jayblanc.pigrows.PiGrowsConfig;
+import fr.jayblanc.pigrows.model.CameraConfig;
 import fr.jayblanc.pigrows.model.Device;
 
 public class LocalFileDeviceService implements DeviceService {
 
     private static final Logger LOGGER = Logger.getLogger(LocalFileDeviceService.class.getName());
 
+    private Validator validator;
     private Gson gson;
     private Map<String, Device> devices;
     private Path store;
@@ -30,6 +38,7 @@ public class LocalFileDeviceService implements DeviceService {
     private LocalFileDeviceService() {
         gson = new GsonBuilder().setPrettyPrinting().create();
         store = Paths.get(PiGrowsConfig.getInstance().getHomePath().toString(), "devices.txt");
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
         loadFromStore();
     }
 
@@ -113,6 +122,25 @@ public class LocalFileDeviceService implements DeviceService {
             throw new DeviceNotFoundException("Unable to find a device with key: " + key);
         }
         devices.get(key).setLastActivity(System.currentTimeMillis());
+        saveToStore();
+    }
+    
+    @Override
+    public void updateConfig(String key, CameraConfig master, CameraConfig slave) throws DeviceNotFoundException, ValidationException {
+        LOGGER.log(Level.FINE, "Updating device config: " + key);
+        if (!devices.containsKey(key)) {
+            throw new DeviceNotFoundException("Unable to find a device with key: " + key);
+        }
+        Set<ConstraintViolation<CameraConfig>> mviolations = validator.validate(master);
+        if (mviolations.size() > 0 ) {
+            throw new ValidationException("Master camera config is not valid");
+        }
+        Set<ConstraintViolation<CameraConfig>> sviolations = validator.validate(slave);
+        if (sviolations.size() > 0 ) {
+            throw new ValidationException("Slave camera config is not valid");
+        }
+        devices.get(key).setMasterConfig(master);
+        devices.get(key).setSlaveConfig(slave);
         saveToStore();
     }
 
