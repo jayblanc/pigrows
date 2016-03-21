@@ -1,4 +1,5 @@
 <#include "/common/head.ftl">
+<#include "/macros/pages.ftl">
 
 <div class="starter-template">
 	<h2 class="page-header">&Eacute;v&eacute;nements</h2>
