@@ -80,7 +80,7 @@ public class LocalFilePictureService implements PictureService {
         LOGGER.log(Level.INFO, "listing pictures for key/folder: " + key + "/" + folder);
         Path path = Paths.get(store.toString(), key, folder);
         try ( Stream<Path> stream = Files.list(path) ) {
-            return stream.sorted((p1, p2) -> compareTime(p1, p2)).skip(offset).limit(limit).map(this::pathToPicture).collect(Collectors.toList());
+            return stream.sorted((p1, p2) -> compareNames(p1, p2)).skip(offset).limit(limit).map(this::pathToPicture).collect(Collectors.toList());
         }
     }
 
@@ -201,12 +201,8 @@ public class LocalFilePictureService implements PictureService {
         }
     }
     
-    private int compareTime(Path p1, Path p2) {
-        try {
-            return Long.compare(Files.getLastModifiedTime(p1).toMillis(), Files.getLastModifiedTime(p2).toMillis());
-        } catch ( Exception e ) {
-            return 0;
-        }
+    private int compareNames(Path p1, Path p2) {
+        return p1.getFileName().compareTo(p2.getFileName());
     }
 
 }
