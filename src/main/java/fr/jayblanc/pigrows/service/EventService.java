@@ -2,6 +2,7 @@ package fr.jayblanc.pigrows.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Path;
 import java.util.List;
 
 import fr.jayblanc.pigrows.model.Event;
@@ -17,5 +18,7 @@ public interface EventService {
     String read(int offset, int limit) throws IOException;
     
     void purge() throws IOException;
-
+    
+    Path readAll();
+    
 }

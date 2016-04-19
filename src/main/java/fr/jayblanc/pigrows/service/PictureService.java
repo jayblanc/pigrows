@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import fr.jayblanc.pigrows.model.Folder;
@@ -11,7 +12,7 @@ import fr.jayblanc.pigrows.model.Picture;
 
 public interface PictureService {
     
-    void store(String key, String filename, InputStream content) throws IOException, IllegalArgumentException;
+    String store(String key, String filename, InputStream content) throws IOException, IllegalArgumentException, NoSuchAlgorithmException;
     
     List<Folder> listFolders(String key) throws IOException;
     

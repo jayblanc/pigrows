@@ -8,11 +8,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -23,7 +26,8 @@ import fr.jayblanc.pigrows.model.Picture;
 public class LocalFilePictureService implements PictureService {
 
     private static final Logger LOGGER = Logger.getLogger(PiGrowsConfig.class.getName());
-    private static final String FILENAME_PATTERN = "(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2})\\:(\\d{2})\\:(\\d{2}).*";
+    //private static final String FILENAME_PATTERN = "(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2})\\:(\\d{2})\\:(\\d{2}).*";
+    private static final String FILENAME_PATTERN = "(L\\w{6})_(D\\d{8})_(T\\d{2})\\:(\\d{2})\\:(\\d{2})_(M|S)(\\.(?i)(jpeg|jpg|png|gif|bmp))$";
     private Path store;
 
     private LocalFilePictureService() {
@@ -40,20 +44,24 @@ public class LocalFilePictureService implements PictureService {
     }
 
     @Override
-    public void store(String key, String filename, InputStream content) throws IOException, IllegalArgumentException {
+    public String store(String key, String filename, InputStream content) throws IOException, IllegalArgumentException, NoSuchAlgorithmException {
         LOGGER.log(Level.INFO, "storing new picture with name : " + filename);
         if (filename.matches(FILENAME_PATTERN)) {
-            Path file = Paths.get(store.toString(), key, filename.substring(0, 7), filename);
+            CheckedInputStream check = new CheckedInputStream(content, new CRC32());
+            Path file = Paths.get(store.toString(), key, filename.substring(0, 8), filename);
             if (!Files.exists(file.getParent())) {
                 Files.createDirectories(file.getParent());
             }
             try {
-                Files.copy(content, file, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(check, file, StandardCopyOption.REPLACE_EXISTING);
+                String crc = Long.toHexString(check.getChecksum().getValue()); 
+                return crc;
             } finally {
+                check.close();
                 content.close();
             }
         } else {
-            throw new IllegalArgumentException("filename does not match pattern YYYY-MM-ddTHH:mm:ss.master.jpg");
+            throw new IllegalArgumentException("filename does not match pattern Lxxxxxx_DYYYYMMdd_THH:mm:ss_Y.jpg");
         }
     }
 

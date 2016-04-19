@@ -89,6 +89,11 @@ public class LocalFileEventService implements EventService {
     }
     
     @Override
+    public Path readAll() {
+        return store;
+    }
+
+    @Override
     public void purge() throws IOException {
         Files.write(store, new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
     }

@@ -36,7 +36,8 @@
 		</#if>
 	</nav>
 	<#if events?size gt 0>
-		<button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-primary">Purger tous les &eacute;v&egrave;nements</button>
+		<a class="btn btn-primary" href="${context}/api/events/file" role="button">T&eacutel&eacutecharger le fichier</a>
+		<button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-danger">Purger tous les &eacute;v&egrave;nements</button>
 	</#if>
 </div>
 

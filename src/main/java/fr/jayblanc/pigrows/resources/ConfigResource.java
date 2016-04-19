@@ -42,6 +42,13 @@ public class ConfigResource {
     }
     
     @GET
+    @Path("/ping")
+    @Produces({ MediaType.TEXT_PLAIN })
+    public String ping() throws IOException {
+        return "pong";
+    }
+    
+    @GET
     @Path("/{key}/{camera}")
     @Produces({ MediaType.APPLICATION_JSON })
     public String getPictureParams(@PathParam("key") String key, @PathParam("camera") String camera) throws DeviceNotFoundException, NoContentException {
