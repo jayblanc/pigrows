@@ -96,7 +96,7 @@ public class LocalFilePictureService implements PictureService {
     public File download(String key, String filename) {
         LOGGER.log(Level.INFO, "downloading picture with name: " + filename);
         if (filename.matches(FILENAME_PATTERN)) {
-            Path path = Paths.get(store.toString(), key, filename.substring(0, 7), filename);
+            Path path = Paths.get(store.toString(), key, filename.substring(9, 15), filename);
             return path.toFile();
         } else {
             throw new IllegalArgumentException("filename does not match pattern");
