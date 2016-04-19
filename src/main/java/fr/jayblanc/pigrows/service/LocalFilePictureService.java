@@ -48,7 +48,7 @@ public class LocalFilePictureService implements PictureService {
         LOGGER.log(Level.INFO, "storing new picture with name : " + filename);
         if (filename.matches(FILENAME_PATTERN)) {
             CheckedInputStream check = new CheckedInputStream(content, new CRC32());
-            Path file = Paths.get(store.toString(), key, filename.substring(0, 8), filename);
+            Path file = Paths.get(store.toString(), key, filename.substring(9, 15), filename);
             if (!Files.exists(file.getParent())) {
                 Files.createDirectories(file.getParent());
             }
@@ -169,10 +169,10 @@ public class LocalFilePictureService implements PictureService {
 
     private Picture pathToPicture(Path path) {
         String filename = path.getFileName().toString();
-        String datetime = filename.substring(0, filename.indexOf("."));
-        String month = path.getParent().getFileName().toString();
-        String year = path.getParent().getParent().getFileName().toString();
-        String key = path.getParent().getParent().getParent().getFileName().toString();
+        String datetime = filename.substring(9,27);
+        String month = filename.substring(13,15);
+        String year = filename.substring(9,14);
+        String key = filename.substring(1,7);
         return new Picture(key, year, month, datetime, filename);
     }
 
