@@ -1,3 +1,3 @@
-The OpenShift `diy` cartridge documentation can be found at:
+The PiGrows Server centralize all photos took by PiGrows devices.
 
-http://openshift.github.io/documentation/oo_cartridge_guide.html#diy
+Application is package using maven to run on tomcat 7 using Java 8. There is also a configuration that allows to deploy on OpenShift.
